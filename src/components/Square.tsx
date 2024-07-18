@@ -21,12 +21,12 @@ export default function Square({
   const onClick = () => {
     if (value) return alert("Cannot insert—value already placed!");
 
-    setGameState((gameState) => {
-      gameState[xIndex][yIndex] = nextValue;
-      return [...gameState];
+    setGameState((currGameState) => {
+      currGameState[xIndex][yIndex] = nextValue;
+      return [...currGameState];
     });
 
-    setNextValue((currValue) => (currValue === "X" ? "O" : "X"));
+    setNextValue((currNextValue) => (currNextValue === "X" ? "O" : "X"));
   };
 
   return (

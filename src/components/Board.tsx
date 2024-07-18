@@ -10,6 +10,8 @@ const INITIAL_GAME_STATE = [
   [null, null, null],
 ];
 
+const INITIAL_NEXT_VALUE = "X";
+
 const isWinner = (
   gameState: BoardState,
   value: BoardPlayerValue,
@@ -40,25 +42,31 @@ const isWinner = (
     (gameState[0][0] === value &&
       gameState[1][1] === value &&
       gameState[2][2] === value) ||
-    (gameState[0][0] === value &&
+    (gameState[2][0] === value &&
       gameState[1][1] === value &&
       gameState[0][2] === value)
-  )
+  ) {
     setWinner(value);
+    return true;
+  }
 };
 
 export default function Board() {
   const [gameState, setGameState] = useState<BoardState>(INITIAL_GAME_STATE);
-  const [nextValue, setNextValue] = useState<BoardPlayerValue>("X");
+  const [nextValue, setNextValue] =
+    useState<BoardPlayerValue>(INITIAL_NEXT_VALUE);
   const [winner, setWinner] = useState<BoardPlayerValue>();
 
   const resetGame = useCallback(() => {
-    setGameState([...INITIAL_GAME_STATE]);
-    setNextValue("X");
+    setGameState((currGameState) =>
+      currGameState.map((row) => row.map((square) => (square = null)))
+    );
+    setNextValue(INITIAL_NEXT_VALUE);
+    setWinner(undefined);
   }, []);
 
   useEffect(() => {
-    isWinner(gameState, "X", setWinner);
+    if (isWinner(gameState, "X", setWinner)) return;
     isWinner(gameState, "O", setWinner);
   }, [gameState]);
 
@@ -75,7 +83,7 @@ export default function Board() {
         Next player: <span>{nextValue}</span>
       </div>
       <div id="winnerArea" className="mt-2 mb-2 font-bold text-lg">
-        Winner: <span>{winner}</span>
+        Winner: <span>{winner ?? "???"}</span>
       </div>
       <button
         className="mt-2 mb-2 p-4 text-lg bg-slate-300 text-black"
