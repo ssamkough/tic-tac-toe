@@ -1,43 +1,8 @@
 "use client";
 import Square from "@/components/Square";
+import type { BoardPlayerValue, BoardState } from "@/utils/types";
+import type { Dispatch, SetStateAction } from "react";
 import { useCallback, useEffect, useState } from "react";
-
-const rowStyle = {
-  display: "flex",
-};
-
-const boardStyle = {
-  backgroundColor: "#eee",
-  width: "208px",
-  alignItems: "center",
-  justifyContent: "center",
-  display: "flex",
-  flexDirection: "column",
-  border: "3px #eee solid",
-};
-
-const containerStyle = {
-  display: "flex",
-  alignItems: "center",
-  flexDirection: "column",
-};
-
-const instructionsStyle = {
-  marginTop: "5px",
-  marginBottom: "5px",
-  fontWeight: "bold",
-  fontSize: "16px",
-};
-
-const buttonStyle = {
-  marginTop: "15px",
-  marginBottom: "16px",
-  width: "80px",
-  height: "40px",
-  backgroundColor: "#8acaca",
-  color: "black",
-  fontSize: "16px",
-};
 
 const INITIAL_GAME_STATE = [
   [null, null, null],
@@ -45,35 +10,82 @@ const INITIAL_GAME_STATE = [
   [null, null, null],
 ];
 
-export default function Board() {
-  const [gameState, setGameState] = useState(INITIAL_GAME_STATE);
-  const [nextValue, setNextValue] = useState("X");
+const isWinner = (
+  gameState: BoardState,
+  value: BoardPlayerValue,
+  setWinner: Dispatch<SetStateAction<BoardPlayerValue | undefined>>
+) => {
+  if (
+    // rows
+    (gameState[0][0] === value &&
+      gameState[0][1] === value &&
+      gameState[0][2] === value) ||
+    (gameState[1][0] === value &&
+      gameState[1][1] === value &&
+      gameState[1][2] === value) ||
+    (gameState[2][0] === value &&
+      gameState[2][1] === value &&
+      gameState[2][2] === value) ||
+    // cols
+    (gameState[0][0] === value &&
+      gameState[1][0] === value &&
+      gameState[2][0] === value) ||
+    (gameState[0][1] === value &&
+      gameState[1][1] === value &&
+      gameState[2][1] === value) ||
+    (gameState[0][2] === value &&
+      gameState[1][2] === value &&
+      gameState[2][2] === value) ||
+    // diagnols
+    (gameState[0][0] === value &&
+      gameState[1][1] === value &&
+      gameState[2][2] === value) ||
+    (gameState[0][0] === value &&
+      gameState[1][1] === value &&
+      gameState[0][2] === value)
+  )
+    setWinner(value);
+};
 
-  const onReset = useCallback(() => {
-    setGameState(INITIAL_GAME_STATE);
+export default function Board() {
+  const [gameState, setGameState] = useState<BoardState>(INITIAL_GAME_STATE);
+  const [nextValue, setNextValue] = useState<BoardPlayerValue>("X");
+  const [winner, setWinner] = useState<BoardPlayerValue>();
+
+  const resetGame = useCallback(() => {
+    setGameState([...INITIAL_GAME_STATE]);
     setNextValue("X");
   }, []);
 
-  console.log("gamestate", gameState);
+  useEffect(() => {
+    isWinner(gameState, "X", setWinner);
+    isWinner(gameState, "O", setWinner);
+  }, [gameState]);
 
-  // useeffect
-  // gamestate
-  useEffect(() => {}, [gameState]);
+  useEffect(() => {
+    if (winner) {
+      alert(`The winner is ${winner} !!!`);
+      resetGame();
+    }
+  }, [resetGame, winner]);
 
   return (
-    <div style={containerStyle} className="gameBoard">
-      <div id="statusArea" className="status" style={instructionsStyle}>
-        Next player: <span>X</span>
+    <div className="flex flex-col items-center">
+      <div id="statusArea" className="mt-6 mb-2 font-bold text-lg">
+        Next player: <span>{nextValue}</span>
       </div>
-      <div id="winnerArea" className="winner" style={instructionsStyle}>
-        Winner: <span></span>
+      <div id="winnerArea" className="mt-2 mb-2 font-bold text-lg">
+        Winner: <span>{winner}</span>
       </div>
-      <button style={buttonStyle} onClick={onReset}>
+      <button
+        className="mt-2 mb-2 p-4 text-lg bg-slate-300 text-black"
+        onClick={resetGame}
+      >
         Reset
       </button>
-      <div style={boardStyle}>
+      <div className="mt-2 flex flex-col items-center justify-center">
         {gameState.map((row, i) => (
-          <div key={i} className="board-row" style={rowStyle}>
+          <div key={i} className="flex">
             {row.map((square, j) => (
               <Square
                 key={`${i}${j}`}

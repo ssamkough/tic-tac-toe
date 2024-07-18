@@ -1,23 +1,14 @@
+import type { BoardPlayerValue, BoardState, BoardValue } from "@/utils/types";
+import type { Dispatch, SetStateAction } from "react";
+
 interface Props {
   xIndex: number;
   yIndex: number;
-  value?: "X" | "O";
-  setGameState: () => {};
+  value: BoardValue;
+  setGameState: Dispatch<SetStateAction<BoardState>>;
   nextValue: "X" | "O" | null;
-  setNextValue: () => {};
+  setNextValue: Dispatch<SetStateAction<BoardPlayerValue>>;
 }
-
-const squareStyle = {
-  width: "60px",
-  height: "60px",
-  backgroundColor: "#ddd",
-  margin: "4px",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-  fontSize: "20px",
-  color: "black",
-};
 
 export default function Square({
   xIndex,
@@ -28,18 +19,21 @@ export default function Square({
   setNextValue,
 }: Props) {
   const onClick = () => {
-    if (value) return alert("has value!");
+    if (value) return alert("Cannot insert—value already placed!");
 
     setGameState((gameState) => {
       gameState[xIndex][yIndex] = nextValue;
-      return gameState;
+      return [...gameState];
     });
 
     setNextValue((currValue) => (currValue === "X" ? "O" : "X"));
   };
 
   return (
-    <div className="square" style={squareStyle} onClick={onClick}>
+    <div
+      className="w-16 h-16 flex items-center justify-center m-1 text-lg text-black bg-slate-300"
+      onClick={onClick}
+    >
       {value ?? null}
     </div>
   );
