@@ -6,7 +6,7 @@ interface Props {
   yIndex: number;
   value: BoardValue;
   setGameState: Dispatch<SetStateAction<BoardState>>;
-  nextValue: "X" | "O" | null;
+  nextValue: BoardPlayerValue;
   setNextValue: Dispatch<SetStateAction<BoardPlayerValue>>;
 }
 
