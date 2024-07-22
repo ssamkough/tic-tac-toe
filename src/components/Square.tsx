@@ -30,11 +30,11 @@ export default function Square({
   };
 
   return (
-    <div
+    <button
       className="w-16 h-16 flex items-center justify-center m-1 text-lg text-black bg-slate-300"
       onClick={onClick}
     >
       {value ?? null}
-    </div>
+    </button>
   );
 }
